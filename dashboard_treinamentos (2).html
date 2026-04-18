@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Treinamentos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f1e;--surface:#111827;--card:#1a2235;--border:#1f2d45;--accent:#3b82f6;--accent2:#06b6d4;--green:#10b981;--orange:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--text:#f1f5f9;--muted:#64748b;--subtle:#94a3b8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;background-image:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,.08) 0,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(6,182,212,.06) 0,transparent 50%)}
+header{padding:18px 40px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;background:rgba(10,15,30,.95);backdrop-filter:blur(10px)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-family:"DM Serif Display",serif;font-size:20px}
+.header-right{display:flex;align-items:center;gap:10px}
+.date-badge{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:13px;color:var(--subtle)}
+#date-display{color:var(--accent2);font-weight:500}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px}
+.tab{padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:"DM Sans",sans-serif;color:var(--muted);background:transparent;border:none;transition:all .2s}
+.tab.active{background:var(--accent);color:#fff}
+.tab:hover:not(.active){color:var(--text)}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:"DM Sans",sans-serif;border:none;font-weight:500;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-outline{background:transparent;color:var(--subtle);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text)}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px;cursor:pointer;font-family:"DM Sans",sans-serif;border:1px solid var(--border);background:var(--surface);color:var(--subtle);transition:all .15s}
+.btn-sm:hover{border-color:var(--accent);color:var(--text)}
+.btn-sm.red:hover{border-color:var(--red);color:var(--red)}
+.main{max-width:1300px;margin:0 auto;padding:36px 40px}
+.page{display:none}.page.active{display:block}
+.hero{text-align:center;padding:40px 0 32px}
+.hero-title{font-family:"DM Serif Display",serif;font-size:34px;margin-bottom:6px}
+.hero-sub{color:var(--muted);font-size:14px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:36px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px;transition:all .2s}
+.stat-card:hover{border-color:rgba(59,130,246,.3);transform:translateY(-2px)}
+.stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.stat-value{font-family:"DM Serif Display",serif;font-size:36px}
+.stat-value.green{color:var(--green)}.stat-value.red{color:var(--red)}.stat-value.orange{color:var(--orange)}.stat-value.blue{color:var(--accent)}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.alert-section{margin-bottom:28px}
+.alert-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+.alert-cards{display:flex;flex-direction:column;gap:8px}
+.alert-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.alert-card.alto{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.05)}
+.alert-card.medio{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.05)}
+.alert-card.mon{border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.05)}
+.alert-info{display:flex;align-items:center;gap:14px}
+.alert-avatar{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:"DM Serif Display",serif;font-size:15px;color:#fff;flex-shrink:0}
+.alert-name{font-size:14px;font-weight:600}
+.alert-email{font-size:12px;color:var(--muted);margin-top:2px}
+.alert-meta{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.badge-orange{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.badge-green{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.badge-blue{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.badge-purple{background:rgba(139,92,246,.15);color:#c084fc;border:1px solid rgba(139,92,246,.3)}
+.badge-gray{background:rgba(100,116,139,.15);color:var(--subtle);border:1px solid var(--border)}
+.section-title{font-family:"DM Serif Display",serif;font-size:24px;margin-bottom:4px}
+.section-sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.section-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);border-bottom:1px solid var(--border)}
+.data-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid rgba(31,45,69,.5);color:var(--subtle);vertical-align:middle}
+.data-table tr:hover td{background:rgba(59,130,246,.04)}
+.table-box{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:32px}
+.table-box-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.table-box-title{font-family:"DM Serif Display",serif;font-size:18px}
+.table-box-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--border)}
+.filter-input{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:"DM Sans",sans-serif}
+.filter-input:focus{outline:none;border-color:var(--accent)}
+.filter-input::placeholder{color:var(--muted)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--subtle);margin-bottom:6px}
+.field input,.field select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;font-family:"DM Sans",sans-serif}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.field select{appearance:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px;width:520px;max-width:94vw;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:"DM Serif Display",serif;font-size:22px;margin-bottom:6px}
+.modal p{color:var(--muted);font-size:13px;margin-bottom:22px}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+.loading{display:flex;align-items:center;justify-content:center;padding:50px;gap:12px;color:var(--muted)}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+.empty-state{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+.pend-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:8px;transition:all .2s}
+.pend-card:hover{border-color:rgba(59,130,246,.3)}
+.pend-info{flex:1;min-width:0}
+.pend-name{font-size:14px;font-weight:600;color:var(--text)}
+.pend-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.pend-actions{display:flex;gap:8px;flex-shrink:0}
+.btn-present{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;font-family:"DM Sans",sans-serif;transition:all .15s}
+.btn-present:hover{background:rgba(16,185,129,.25)}
+.btn-falta{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.3);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;font-family:"DM Sans",sans-serif;transition:all .15s}
+.btn-falta:hover{background:rgba(239,68,68,.22)}
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);animation:slideInB .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast.success{border-color:rgba(16,185,129,.4)}.toast.error{border-color:rgba(239,68,68,.4)}
+.info-box{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--subtle);margin-bottom:14px;line-height:1.6}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideInB{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:640px){header{padding:14px 16px}.main{padding:20px 16px}.tabs{display:none}.form-row{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">&#128203;</div>
+    <span class="logo-text">Treinamentos</span>
+  </div>
+  <div class="header-right">
+    <div class="date-badge">Hoje: <span id="date-display"></span></div>
+    <div class="tabs">
+      <button class="tab active" onclick="showPage('visao')">Vis&#227;o Geral</button>
+      <button class="tab" onclick="showPage('agendamentos')">Agendamentos</button>
+      <button class="tab" onclick="showPage('presenca')">Registrar Presen&#231;a</button>
+      <button class="tab" onclick="showPage('usuarios')">Usu&#225;rios</button>
+    </div>
+    <button class="btn btn-outline" onclick="openConfig()" style="padding:7px 12px;font-size:12px;">&#9881; Config</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- VISAO GERAL -->
+  <div id="page-visao" class="page active">
+    <div class="hero">
+      <div class="hero-title">Painel de Treinamentos</div>
+      <div class="hero-sub" id="visao-sub">Carregando resumo...</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Agendamentos hoje</div><div class="stat-value blue" id="s-hoje">0</div><div class="stat-sub">treinamentos do dia</div></div>
+      <div class="stat-card"><div class="stat-label">Total esta semana</div><div class="stat-value" id="s-semana">0</div><div class="stat-sub">seg a sex</div></div>
+      <div class="stat-card"><div class="stat-label">Pendentes</div><div class="stat-value orange" id="s-pend">0</div><div class="stat-sub">aguardam confirma&#231;&#227;o</div></div>
+      <div class="stat-card"><div class="stat-label">Taxa de presen&#231;a</div><div class="stat-value green" id="s-taxa">&#8212;</div><div class="stat-sub">geral acumulado</div></div>
+      <div class="stat-card"><div class="stat-label">Total de faltas</div><div class="stat-value red" id="s-faltas">0</div><div class="stat-sub">todos os per&#237;odos</div></div>
+      <div class="stat-card"><div class="stat-label">Em monitoramento</div><div class="stat-value orange" id="s-mon">0</div><div class="stat-sub">usu&#225;rios em alerta</div></div>
+    </div>
+    <div class="alert-section">
+      <div class="alert-title">&#9888; Usu&#225;rios que precisam de aten&#231;&#227;o</div>
+      <div id="alertas-container" class="alert-cards"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+    </div>
+    <div class="table-box">
+      <div class="table-box-header">
+        <div><div class="table-box-title">Agendamentos de Hoje</div><div class="table-box-sub">Treinamentos programados para esta data</div></div>
+        <button class="btn btn-primary" onclick="showPage('agendamentos');openModalAg()">+ Novo agendamento</button>
+      </div>
+      <div id="hoje-container" style="padding:8px 0"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+  <!-- AGENDAMENTOS -->
+  <div id="page-agendamentos" class="page">
+    <div class="section-top">
+      <div><div class="section-title">Agendamentos</div><div class="section-sub">Todos os treinamentos registrados</div></div>
+      <button class="btn btn-primary" onclick="openModalAg()">+ Novo agendamento</button>
+    </div>
+    <div class="table-box">
+      <div class="filter-row">
+        <input class="filter-input" type="text" id="busca-ag" placeholder="Buscar por nome ou e-mail..." oninput="renderAgendamentos()" style="flex:1;min-width:180px">
+        <select class="filter-input" id="filtro-status" onchange="renderAgendamentos()">
+          <option value="">Todos os status</option>
+          <option value="pendente">Pendente</option>
+          <option value="presente">Presente</option>
+          <option value="falta">Falta</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+        <select class="filter-input" id="filtro-periodo" onchange="renderAgendamentos()">
+          <option value="">Todos os per&#237;odos</option>
+          <option value="hoje">Hoje</option>
+          <option value="semana">Esta semana</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Hor&#225;rio</th><th>Usu&#225;rio</th><th>E-mail</th><th>Presen&#231;a</th><th>Faltas totais</th><th>A&#231;&#245;es</th></tr></thead>
+          <tbody id="ag-tbody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRESENCA -->
+  <div id="page-presenca" class="page">
+    <div class="section-top">
+      <div><div class="section-title">Registrar Presen&#231;a</div><div class="section-sub">Agendamentos pendentes de confirma&#231;&#227;o</div></div>
+      <button class="btn btn-outline" onclick="loadAll()">&#128260; Atualizar</button>
+    </div>
+    <div id="pend-container"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+  </div>
+
+  <!-- USUARIOS -->
+  <div id="page-usuarios" class="page">
+    <div class="section-top">
+      <div><div class="section-title">Usu&#225;rios</div><div class="section-sub">Ranking de faltas e controle de monitoramento</div></div>
+    </div>
+    <div class="table-box">
+      <div class="filter-row">
+        <input class="filter-input" type="text" id="busca-user" placeholder="Buscar por nome ou e-mail..." oninput="renderUsuarios()" style="flex:1;min-width:180px">
+        <select class="filter-input" id="filtro-mon" onchange="renderUsuarios()">
+          <option value="">Todos</option>
+          <option value="monitorado">Monitorados</option>
+          <option value="bloqueado">Bloqueados</option>
+          <option value="regular">Regulares</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Usu&#225;rio</th><th>E-mail</th><th>Total</th><th>Presen&#231;as</th><th>Faltas</th><th>Taxa</th><th>Risco</th><th>Status</th><th>A&#231;&#245;es</th></tr></thead>
+          <tbody id="user-tbody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL AGENDAMENTO -->
+<div class="modal-overlay" id="modal-ag">
+  <div class="modal">
+    <h3 id="modal-ag-titulo">Novo Agendamento</h3>
+    <p>Registre um treinamento gratuito para um usu&#225;rio</p>
+    <div class="form-row">
+      <div class="field"><label>Nome do usu&#225;rio</label><input type="text" id="ag-nome" placeholder="Ex: Jo&#227;o Silva"></div>
+      <div class="field"><label>E-mail</label><input type="email" id="ag-email" placeholder="joao@email.com"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Data</label><input type="date" id="ag-data"></div>
+      <div class="field"><label>Hor&#225;rio</label><input type="time" id="ag-hora"></div>
+    </div>
+    <div class="field"><label>Observa&#231;&#227;o (opcional)</label><input type="text" id="ag-obs" placeholder="Ex: onboarding"></div>
+    <div id="ag-erro" style="display:none;font-size:12px;color:#f87171;margin-bottom:12px;padding:8px 12px;background:rgba(239,68,68,.1);border-radius:6px;border:1px solid rgba(239,68,68,.3)"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModalAg()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAgendamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL USUARIO -->
+<div class="modal-overlay" id="modal-user">
+  <div class="modal">
+    <h3 id="modal-user-titulo">Editar usu&#225;rio</h3>
+    <p>Defina manualmente o n&#237;vel de monitoramento</p>
+    <input type="hidden" id="user-edit-email">
+    <div class="field">
+      <label>Status</label>
+      <select id="user-status">
+        <option value="regular">Regular</option>
+        <option value="monitorado">Monitorado</option>
+        <option value="bloqueado">Bloqueado</option>
+      </select>
+    </div>
+    <div class="field"><label>Observa&#231;&#227;o interna</label><input type="text" id="user-obs" placeholder="Ex: 3 faltas consecutivas em abril"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModalUser()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarUser()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIG -->
+<div class="modal-overlay" id="modal-config">
+  <div class="modal">
+    <h3>&#9881; Configura&#231;&#227;o do Supabase</h3>
+    <p>Cole as credenciais do seu projeto. O navegador salva automaticamente.</p>
+    <div class="field"><label>URL do projeto</label><input type="text" id="cfg-url" placeholder="https://xxxx.supabase.co"></div>
+    <div class="field"><label>Anon Key (leitura)</label><input type="password" id="cfg-key" placeholder="eyJhbGci..."></div>
+    <div class="field"><label>Service Role Key (escrita)</label><input type="password" id="cfg-svc" placeholder="eyJhbGci..."></div>
+    <div class="info-box">
+      <strong style="color:var(--accent)">URL:</strong> Settings &rarr; General &rarr; Project ID &rarr; monte como <code style="color:var(--accent2);font-size:11px">https://SEU_ID.supabase.co</code><br><br>
+      <strong style="color:var(--accent)">Chaves:</strong> Settings &rarr; API Keys &rarr; <em>Publishable key</em> (Anon Key) e <em>Secret key</em> (Service Role Key).
+    </div>
+    <div id="cfg-erro" style="display:none;font-size:12px;color:#f87171;margin-bottom:12px;padding:8px 12px;background:rgba(239,68,68,.1);border-radius:6px;border:1px solid rgba(239,68,68,.3)"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeConfig()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Salvar e conectar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var SB_URL = localStorage.getItem("trein_sb_url") || "";
+var SB_KEY = localStorage.getItem("trein_sb_key") || "";
+var SB_SVC = localStorage.getItem("trein_sb_svc") || "";
+
+var agendamentos = [];
+var monitorados  = {};
+
+var HOJE = new Date();
+var HOJE_STR = HOJE.toISOString().slice(0,10);
+var DIAS_PT  = ["Dom","Seg","Ter","Qua","Qui","Sex","S\u00e1b"];
+var MESES_PT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+
+document.getElementById("date-display").textContent =
+  DIAS_PT[HOJE.getDay()] + ", " + HOJE.getDate() + " " + MESES_PT[HOJE.getMonth()] + " " + HOJE.getFullYear();
+
+function openConfig(){
+  document.getElementById("cfg-url").value = SB_URL;
+  document.getElementById("cfg-key").value = SB_KEY;
+  document.getElementById("cfg-svc").value = SB_SVC;
+  document.getElementById("modal-config").classList.add("open");
+}
+function closeConfig(){ document.getElementById("modal-config").classList.remove("open"); }
+function saveConfig(){
+  var url = document.getElementById("cfg-url").value.trim().replace(/\/$/, "");
+  var key = document.getElementById("cfg-key").value.trim();
+  var svc = document.getElementById("cfg-svc").value.trim();
+  var errEl = document.getElementById("cfg-erro");
+
+  if(!url || !key){ errEl.style.display = "block"; errEl.textContent = "Preencha ao menos a URL e a Publishable key."; return; }
+  if(!url.startsWith("https://")){ errEl.style.display = "block"; errEl.textContent = "A URL deve comecar com https://"; return; }
+  errEl.style.display = "none";
+
+  SB_URL = url; SB_KEY = key; SB_SVC = svc;
+  localStorage.setItem("trein_sb_url", SB_URL);
+  localStorage.setItem("trein_sb_key", SB_KEY);
+  localStorage.setItem("trein_sb_svc", SB_SVC);
+
+  var btn = document.querySelector("#modal-config .btn-primary");
+  btn.textContent = "Conectando...";
+  btn.disabled = true;
+
+  closeConfig();
+  btn.textContent = "Salvar e conectar";
+  btn.disabled = false;
+  loadAll(true);
+}
+
+function showPage(p){
+  document.querySelectorAll(".page").forEach(function(el){ el.classList.remove("active"); });
+  document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
+  document.getElementById("page-" + p).classList.add("active");
+  var map = {visao:0, agendamentos:1, presenca:2, usuarios:3};
+  var tabs = document.querySelectorAll(".tab");
+  if(tabs[map[p]]) tabs[map[p]].classList.add("active");
+}
+
+function hdrs(write){
+  var key = write ? (SB_SVC || SB_KEY) : SB_KEY;
+  return {"apikey": key, "Authorization": "Bearer " + key, "Content-Type": "application/json", "Prefer": write ? "return=representation" : "return=minimal"};
+}
+
+function sbFetch(path){
+  if(!SB_URL || !SB_KEY) return Promise.resolve([]);
+  return fetch(SB_URL + "/rest/v1/" + path, {headers: hdrs(false)}).then(function(r){
+    if(!r.ok) throw new Error(r.status);
+    return r.json();
+  });
+}
+function sbPost(table, body){
+  return fetch(SB_URL + "/rest/v1/" + table, {method:"POST", headers: hdrs(true), body: JSON.stringify(body)}).then(function(r){
+    if(!r.ok) return r.text().then(function(t){ throw new Error(t); });
+    return r.json();
+  });
+}
+function sbPatch(table, filter, body){
+  return fetch(SB_URL + "/rest/v1/" + table + "?" + filter, {method:"PATCH", headers: hdrs(true), body: JSON.stringify(body)}).then(function(r){
+    if(!r.ok) return r.text().then(function(t){ throw new Error(t); });
+    return true;
+  });
+}
+function sbDelete(table, filter){
+  return fetch(SB_URL + "/rest/v1/" + table + "?" + filter, {method:"DELETE", headers: hdrs(true)}).then(function(r){ return r.ok; });
+}
+function sbUpsert(table, body, onConflict){
+  var h = hdrs(true);
+  h["Prefer"] = "resolution=merge-duplicates,return=representation";
+  var url = SB_URL + "/rest/v1/" + table + (onConflict ? "?on_conflict=" + onConflict : "");
+  return fetch(url, {method:"POST", headers: h, body: JSON.stringify(body)}).then(function(r){
+    if(!r.ok) return r.text().then(function(t){ throw new Error(t); });
+    return r.json();
+  });
+}
+
+function fmtData(d){
+  if(!d) return "\u2014";
+  var dt = new Date(d + "T12:00:00");
+  return String(dt.getDate()).padStart(2,"0") + "/" + String(dt.getMonth()+1).padStart(2,"0") + "/" + dt.getFullYear();
+}
+function initiais(nome){
+  if(!nome) return "?";
+  var p = nome.trim().split(" ");
+  return (p[0][0] + (p[1] ? p[1][0] : "")).toUpperCase();
+}
+function isBloqueado(email){
+  var m = monitorados[(email||"").toLowerCase()];
+  return m && m.status === "bloqueado";
+}
+function getStatus(email){
+  var m = monitorados[(email||"").toLowerCase()];
+  return m ? m.status : "regular";
+}
+function faltasPor(email){
+  return agendamentos.filter(function(a){ return (a.email||"").toLowerCase() === email.toLowerCase() && a.presenca === "falta"; }).length;
+}
+function nivelRisco(faltas){
+  if(faltas >= 3) return "alto";
+  if(faltas >= 2) return "medio";
+  if(faltas >= 1) return "baixo";
+  return "ok";
+}
+function semanaStart(){
+  var d = new Date(HOJE); d.setHours(0,0,0,0);
+  var day = d.getDay();
+  d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  return d;
+}
+function badgePresenca(p){
+  var m = {presente:["badge-green","Presente"], falta:["badge-red","Falta"], cancelado:["badge-gray","Cancelado"], pendente:["badge-blue","Pendente"]};
+  var v = m[p] || ["badge-gray","\u2014"];
+  return "<span class=\"badge " + v[0] + "\">" + v[1] + "</span>";
+}
+function getUserMap(){
+  var map = {};
+  agendamentos.forEach(function(a){
+    var k = (a.email||"").toLowerCase();
+    if(!map[k]) map[k] = {nome: a.nome, email: a.email||"", total:0, presentes:0, faltas:0, pendentes:0};
+    map[k].total++;
+    if(a.presenca === "presente") map[k].presentes++;
+    else if(a.presenca === "falta") map[k].faltas++;
+    else if(a.presenca === "pendente") map[k].pendentes++;
+  });
+  return map;
+}
+
+function loadAll(showSuccess){
+  if(!SB_URL || !SB_KEY){ openConfig(); return; }
+  Promise.all([
+    sbFetch("treinamentos?select=*&order=data.desc,horario.asc"),
+    sbFetch("usuarios_monitorados?select=*").catch(function(){ return []; })
+  ]).then(function(results){
+    agendamentos = Array.isArray(results[0]) ? results[0] : [];
+    monitorados  = {};
+    if(Array.isArray(results[1])) results[1].forEach(function(m){ monitorados[m.email.toLowerCase()] = m; });
+    renderVisao();
+    renderAgendamentos();
+    renderPresenca();
+    renderUsuarios();
+    if(showSuccess) toast("Conectado com sucesso!");
+  }).catch(function(e){
+    toast("Erro ao conectar: verifique a URL e as chaves. (" + e.message + ")", "error");
+  });
+}
+
+function renderVisao(){
+  var ws = semanaStart();
+  var we = new Date(ws); we.setDate(ws.getDate()+4);
+  var hoje   = agendamentos.filter(function(a){ return a.data === HOJE_STR; });
+  var semana = agendamentos.filter(function(a){ var d = new Date(a.data+"T12:00"); return d >= ws && d <= we; });
+  var pend   = agendamentos.filter(function(a){ return a.presenca === "pendente"; });
+  var pres   = agendamentos.filter(function(a){ return a.presenca === "presente"; });
+  var faltas = agendamentos.filter(function(a){ return a.presenca === "falta"; });
+  var concl  = pres.length + faltas.length;
+  var taxa   = concl > 0 ? Math.round(pres.length / concl * 100) + "%" : "\u2014";
+
+  document.getElementById("visao-sub").textContent = DIAS_PT[HOJE.getDay()] + ", " + HOJE.getDate() + " de " + MESES_PT[HOJE.getMonth()] + " \u2014 " + hoje.length + " treinamento(s) hoje";
+  document.getElementById("s-hoje").textContent   = hoje.length;
+  document.getElementById("s-semana").textContent = semana.length;
+  document.getElementById("s-pend").textContent   = pend.length;
+  document.getElementById("s-taxa").textContent   = taxa;
+  document.getElementById("s-faltas").textContent = faltas.length;
+  document.getElementById("s-mon").textContent    = Object.values(monitorados).filter(function(m){ return m.status === "monitorado" || m.status === "bloqueado"; }).length;
+
+  var map = getUserMap();
+  var lista = Object.values(map).filter(function(u){ return nivelRisco(u.faltas) !== "ok" || getStatus(u.email) !== "regular"; });
+  lista.sort(function(a,b){ return b.faltas - a.faltas; });
+  var el = document.getElementById("alertas-container");
+  if(!lista.length){
+    el.innerHTML = "<div style=\"text-align:center;padding:24px;color:var(--muted);font-size:13px;\">Nenhum usu&#225;rio em alerta no momento &#10003;</div>";
+  } else {
+    el.innerHTML = lista.slice(0,6).map(function(u){
+      var status = getStatus(u.email);
+      var risco  = nivelRisco(u.faltas);
+      var cls    = status === "bloqueado" ? "mon" : risco === "alto" ? "alto" : "medio";
+      var avcls  = status === "bloqueado" ? "background:linear-gradient(135deg,#8b5cf6,#7c3aed)" : risco === "alto" ? "background:linear-gradient(135deg,#ef4444,#dc2626)" : "background:linear-gradient(135deg,#f59e0b,#d97706)";
+      var badge  = status === "bloqueado" ? "<span class=\"badge badge-purple\">Bloqueado</span>" : status === "monitorado" ? "<span class=\"badge badge-orange\">Monitorado</span>" : risco === "alto" ? "<span class=\"badge badge-red\">Alto risco</span>" : "<span class=\"badge badge-orange\">Aten&#231;&#227;o</span>";
+      return "<div class=\"alert-card " + cls + "\"><div class=\"alert-info\"><div class=\"alert-avatar\" style=\"" + avcls + "\">" + initiais(u.nome) + "</div><div><div class=\"alert-name\">" + u.nome + "</div><div class=\"alert-email\">" + u.email + " &middot; " + u.faltas + " falta(s)</div></div></div><div class=\"alert-meta\">" + badge + "<button class=\"btn-sm\" onclick=\"showPage('usuarios')\">Ver &rarr;</button></div></div>";
+    }).join("");
+  }
+
+  var hojeEl = document.getElementById("hoje-container");
+  if(!hoje.length){
+    hojeEl.innerHTML = "<div class=\"empty-state\">Nenhum treinamento agendado para hoje.</div>";
+  } else {
+    var rows = hoje.map(function(a){
+      return "<tr><td>" + (a.horario||"\u2014").slice(0,5) + "h</td><td style=\"color:var(--text);font-weight:500;\">" + (a.nome||"\u2014") + "</td><td>" + (a.email||"\u2014") + "</td><td>" + badgePresenca(a.presenca) + "</td></tr>";
+    }).join("");
+    hojeEl.innerHTML = "<table class=\"data-table\"><thead><tr><th>Hor&#225;rio</th><th>Usu&#225;rio</th><th>E-mail</th><th>Presen&#231;a</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }
+}
+
+function renderAgendamentos(){
+  var busca   = (document.getElementById("busca-ag").value||"").toLowerCase();
+  var status  = document.getElementById("filtro-status").value||"";
+  var periodo = document.getElementById("filtro-periodo").value||"";
+  var ws = semanaStart();
+  var we = new Date(ws); we.setDate(ws.getDate()+4);
+
+  var lista = agendamentos.filter(function(a){
+    if(busca && !(a.nome||"").toLowerCase().includes(busca) && !(a.email||"").toLowerCase().includes(busca)) return false;
+    if(status && a.presenca !== status) return false;
+    if(periodo === "hoje" && a.data !== HOJE_STR) return false;
+    if(periodo === "semana"){ var d = new Date(a.data+"T12:00"); if(d < ws || d > we) return false; }
+    return true;
+  });
+  lista.sort(function(a,b){ return b.data.localeCompare(a.data) || (a.horario||"").localeCompare(b.horario||""); });
+
+  var tbody = document.getElementById("ag-tbody");
+  if(!lista.length){ tbody.innerHTML = "<tr><td colspan=\"7\"><div class=\"empty-state\">Nenhum agendamento encontrado.</div></td></tr>"; return; }
+  tbody.innerHTML = lista.map(function(a){
+    var f = faltasPor(a.email||"");
+    var risco = f >= 3 ? "<span class=\"badge badge-red\" style=\"margin-left:6px\">" + f + " faltas</span>" : f >= 2 ? "<span class=\"badge badge-orange\" style=\"margin-left:6px\">" + f + " faltas</span>" : "";
+    var acoes = "";
+    if(a.presenca === "pendente"){
+      acoes += "<button class=\"btn-sm\" onclick=\"marcar(" + a.id + ",'presente')\">&#10003; Presente</button> ";
+      acoes += "<button class=\"btn-sm red\" onclick=\"marcar(" + a.id + ",'falta')\">&#10007; Falta</button> ";
+    }
+    acoes += "<button class=\"btn-sm red\" onclick=\"cancelarAg(" + a.id + ")\">Cancelar</button>";
+    return "<tr><td style=\"color:var(--text)\">" + fmtData(a.data) + "</td><td>" + (a.horario||"\u2014").slice(0,5) + "h</td><td style=\"color:var(--text);font-weight:500;\">" + (a.nome||"\u2014") + risco + "</td><td>" + (a.email||"\u2014") + "</td><td>" + badgePresenca(a.presenca) + "</td><td>" + f + "</td><td style=\"display:flex;gap:6px;flex-wrap:wrap;\">" + acoes + "</td></tr>";
+  }).join("");
+}
+
+function renderPresenca(){
+  var pend = agendamentos.filter(function(a){ return a.presenca === "pendente"; });
+  pend.sort(function(a,b){ return a.data.localeCompare(b.data) || (a.horario||"").localeCompare(b.horario||""); });
+  var el = document.getElementById("pend-container");
+  if(!pend.length){
+    el.innerHTML = "<div class=\"empty-state\" style=\"padding:60px;background:var(--card);border-radius:16px;border:1px solid var(--border)\">Nenhum agendamento pendente &#10003;</div>";
+    return;
+  }
+  el.innerHTML = pend.map(function(a){
+    return "<div class=\"pend-card\"><div class=\"alert-avatar\" style=\"background:linear-gradient(135deg,var(--accent),var(--accent2));flex-shrink:0\">" + initiais(a.nome) + "</div><div class=\"pend-info\"><div class=\"pend-name\">" + (a.nome||"\u2014") + "</div><div class=\"pend-meta\">" + (a.email||"\u2014") + " &middot; " + fmtData(a.data) + " \u00e0s " + (a.horario||"\u2014").slice(0,5) + "h" + (a.obs ? " &middot; " + a.obs : "") + "</div></div><div class=\"pend-actions\"><button class=\"btn-present\" onclick=\"marcar(" + a.id + ",'presente')\">&#10003; Presente</button><button class=\"btn-falta\" onclick=\"marcar(" + a.id + ",'falta')\">&#10007; Falta</button></div></div>";
+  }).join("");
+}
+
+function renderUsuarios(){
+  var busca   = (document.getElementById("busca-user").value||"").toLowerCase();
+  var filtMon = document.getElementById("filtro-mon").value||"";
+  var map = getUserMap();
+  var lista = Object.values(map).filter(function(u){
+    if(busca && !u.nome.toLowerCase().includes(busca) && !u.email.toLowerCase().includes(busca)) return false;
+    if(filtMon && getStatus(u.email) !== filtMon) return false;
+    return true;
+  });
+  lista.sort(function(a,b){ return b.faltas - a.faltas || b.total - a.total; });
+
+  var tbody = document.getElementById("user-tbody");
+  if(!lista.length){ tbody.innerHTML = "<tr><td colspan=\"9\"><div class=\"empty-state\">Nenhum usu&#225;rio encontrado.</div></td></tr>"; return; }
+  tbody.innerHTML = lista.map(function(u){
+    var taxa  = (u.presentes + u.faltas) > 0 ? Math.round(u.presentes / (u.presentes + u.faltas) * 100) + "%" : "\u2014";
+    var risco = nivelRisco(u.faltas);
+    var rHtml = risco === "alto" ? "<span class=\"badge badge-red\">Alto risco</span>" : risco === "medio" ? "<span class=\"badge badge-orange\">Aten&#231;&#227;o</span>" : risco === "baixo" ? "<span class=\"badge badge-gray\">Baixo</span>" : "<span class=\"badge badge-green\">OK</span>";
+    var st    = getStatus(u.email);
+    var sHtml = st === "bloqueado" ? "<span class=\"badge badge-purple\">Bloqueado</span>" : st === "monitorado" ? "<span class=\"badge badge-orange\">Monitorado</span>" : "<span class=\"badge badge-green\">Regular</span>";
+    var obs   = (monitorados[u.email.toLowerCase()] || {}).obs || "";
+    var emailSafe = u.email.replace(/"/g, "&quot;");
+    var nomeSafe  = u.nome.replace(/"/g, "&quot;").replace(/\\/g, "");
+    return "<tr><td style=\"color:var(--text);font-weight:500;\">" + u.nome + "</td><td>" + u.email + "</td><td>" + u.total + "</td><td>" + u.presentes + "</td><td style=\"color:" + (u.faltas>=3?"var(--red)":u.faltas>=2?"var(--orange)":"var(--subtle)") + ";font-weight:" + (u.faltas>=2?"600":"400") + "\">" + u.faltas + "</td><td>" + taxa + "</td><td>" + rHtml + "</td><td>" + sHtml + (obs ? "<div style=\"font-size:11px;color:var(--muted);margin-top:3px;\">" + obs + "</div>" : "") + "</td><td><button class=\"btn-sm\" onclick=\"openModalUser(this);\" data-email=\"" + emailSafe + "\" data-nome=\"" + nomeSafe + "\">Editar</button></td></tr>";
+  }).join("");
+}
+
+function marcar(id, presenca){
+  sbPatch("treinamentos", "id=eq." + id, {presenca: presenca}).then(function(){
+    var ag = agendamentos.find(function(a){ return a.id == id; });
+    if(ag){
+      ag.presenca = presenca;
+      if(presenca === "falta"){
+        var f = faltasPor(ag.email);
+        var ek = (ag.email||"").toLowerCase();
+        if(f >= 3 && !monitorados[ek]){
+          sbUpsert("usuarios_monitorados", {email: ag.email, nome: ag.nome, status: "monitorado", obs: "Auto: " + f + " faltas"}, "email").then(function(){
+            monitorados[ek] = {email: ag.email, nome: ag.nome, status: "monitorado", obs: "Auto: " + f + " faltas"};
+            toast(ag.nome + " adicionado ao monitoramento.", "error");
+            renderAll();
+          }).catch(function(){ renderAll(); });
+          return;
+        }
+      }
+    }
+    renderAll();
+    toast("Presen&#231;a registrada: " + (presenca === "presente" ? "Presente &#10003;" : "Falta &#10007;"));
+  }).catch(function(e){ toast("Erro: " + e.message, "error"); });
+}
+
+function cancelarAg(id){
+  if(!confirm("Cancelar este agendamento?")) return;
+  sbPatch("treinamentos", "id=eq." + id, {presenca: "cancelado"}).then(function(){
+    var ag = agendamentos.find(function(a){ return a.id == id; });
+    if(ag) ag.presenca = "cancelado";
+    renderAll();
+    toast("Agendamento cancelado.");
+  }).catch(function(e){ toast("Erro: " + e.message, "error"); });
+}
+
+function renderAll(){
+  renderVisao(); renderAgendamentos(); renderPresenca(); renderUsuarios();
+}
+
+function openModalAg(){
+  document.getElementById("ag-edit-id") && (document.getElementById("ag-edit-id").value = "");
+  document.getElementById("modal-ag-titulo").textContent = "Novo Agendamento";
+  document.getElementById("ag-nome").value  = "";
+  document.getElementById("ag-email").value = "";
+  document.getElementById("ag-data").value  = HOJE_STR;
+  document.getElementById("ag-hora").value  = "";
+  document.getElementById("ag-obs").value   = "";
+  document.getElementById("ag-erro").style.display = "none";
+  document.getElementById("modal-ag").classList.add("open");
+}
+function closeModalAg(){ document.getElementById("modal-ag").classList.remove("open"); }
+
+function salvarAgendamento(){
+  var nome  = document.getElementById("ag-nome").value.trim();
+  var email = document.getElementById("ag-email").value.trim().toLowerCase();
+  var data  = document.getElementById("ag-data").value;
+  var hora  = document.getElementById("ag-hora").value;
+  var obs   = document.getElementById("ag-obs").value.trim();
+  var erroEl = document.getElementById("ag-erro");
+
+  function err(msg){ erroEl.textContent = msg; erroEl.style.display = "block"; }
+
+  if(!nome || !email || !data || !hora){ err("Preencha todos os campos obrigat&#243;rios."); return; }
+  if(isBloqueado(email)){ err("Este usu&#225;rio est&#225; bloqueado e n&#227;o pode agendar."); return; }
+  var jaTemNoDia = agendamentos.find(function(a){ return (a.email||"").toLowerCase() === email && a.data === data && a.presenca !== "cancelado"; });
+  if(jaTemNoDia){ err("Este usu&#225;rio j&#225; tem agendamento nesta data."); return; }
+
+  erroEl.style.display = "none";
+  sbPost("treinamentos", {nome:nome, email:email, data:data, horario:hora+":00", obs:obs, presenca:"pendente"}).then(function(res){
+    if(Array.isArray(res) && res[0]) agendamentos.unshift(res[0]);
+    closeModalAg();
+    renderAll();
+    toast("Agendamento salvo!");
+  }).catch(function(e){ err("Erro ao salvar: " + e.message); });
+}
+
+function openModalUser(btn){
+  var email = btn.getAttribute("data-email");
+  var nome  = btn.getAttribute("data-nome");
+  document.getElementById("user-edit-email").value = email;
+  document.getElementById("modal-user-titulo").textContent = "Editar: " + nome;
+  var m = monitorados[email.toLowerCase()];
+  document.getElementById("user-status").value = m ? m.status : "regular";
+  document.getElementById("user-obs").value = m ? (m.obs||"") : "";
+  document.getElementById("modal-user").classList.add("open");
+}
+function closeModalUser(){ document.getElementById("modal-user").classList.remove("open"); }
+
+function salvarUser(){
+  var email  = document.getElementById("user-edit-email").value;
+  var status = document.getElementById("user-status").value;
+  var obs    = document.getElementById("user-obs").value.trim();
+  var ag     = agendamentos.find(function(a){ return (a.email||"").toLowerCase() === email.toLowerCase(); });
+  var nome   = ag ? ag.nome : email;
+
+  if(status === "regular"){
+    sbDelete("usuarios_monitorados", "email=eq." + encodeURIComponent(email)).then(function(){
+      delete monitorados[email.toLowerCase()];
+      closeModalUser(); renderAll(); toast("Status atualizado!");
+    }).catch(function(e){ toast("Erro: " + e.message, "error"); });
+  } else {
+    sbUpsert("usuarios_monitorados", {email:email, nome:nome, status:status, obs:obs}, "email").then(function(){
+      monitorados[email.toLowerCase()] = {email:email, nome:nome, status:status, obs:obs};
+      closeModalUser(); renderAll(); toast("Status atualizado!");
+    }).catch(function(e){ toast("Erro: " + e.message, "error"); });
+  }
+}
+
+function toast(msg, type){
+  type = type || "success";
+  var t = document.createElement("div");
+  t.className = "toast " + type;
+  t.innerHTML = "<span style=\"font-size:16px;\">" + (type === "error" ? "&#9888;" : "&#10003;") + "</span><span>" + msg + "</span>";
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 4000);
+}
+
+if(!SB_URL || !SB_KEY){
+  openConfig();
+} else {
+  loadAll();
+}
+</script>
+</body>
+</html>
